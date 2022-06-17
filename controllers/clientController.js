@@ -3,24 +3,45 @@ const { User } = require('./userController');
 
 exports.Client=Object.create({
     Register:async (req,res) =>{
-        try {
-            const { firstName,lastName,phone,email,cnic,province,city,permanentAddress} = req.body;
+                try {
+            const { fullname,email,password} = req.body;
+            console.log({fullname,email,password})
+            console.log(req.file)
             const client=new Clients({
-                firstName,
-                lastName,
-                phone,
+                fullname,
                 email,
-                cnic,
-                province,
-                city,
-                permanentAddress
+                password,
+                empPic:req.file.filename
             });
-            await client.save( async (_client,_error)=>{
+            await client.save( async (_error,_client)=>{
                 if(_error) return await res.status(400).json({_error});
-                if(_client) return await res.status(201).json({message:"saved successfully"});
+                if(_client) return await res.status(201).json({_client:_client});
             })
         } catch (error) {
             return await res.status(500).json({error});
+        }
+    },
+    Login: async( req,res)=>{
+        try {
+           
+            const {email,password} = req.body;
+            await Clients.findOne({email:email})
+            .exec((_error,_client)=>{
+                if(_error) return res.status(400).json(_error);
+                if(_client)
+                {
+                    if(_client.password===password)
+                    {
+                        return res.status(200).json({_client:_client});
+                    }
+                    else{
+                        return res.status(200).json({_client:'password not matching'});
+                    }
+                }
+            })
+
+        } catch (error) {
+            return await res.status(500).json({error:error.message})
         }
     },
     GetClient: async (req,res) => {

@@ -9,6 +9,7 @@ const clientScheme=new mongoose.Schema({
     province:{type:String,default:'empty'},
     city:{type:String,default:'empty'},
     permanentAddress:{type:String,default:'empty'},
-    empPic:{type:String,default:'empty'}
+    empPic:{type:String,default:'empty'},
+    active:{type:Boolean,default:true}
 });
 module.exports=mongoose.model("Clients",clientScheme);

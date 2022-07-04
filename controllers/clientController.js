@@ -1,6 +1,8 @@
 const Clients =require('../models/client');
 const { User } = require('./userController');
-
+const dotenv=require('dotenv');
+dotenv.config();
+const jwt=require('jsonwebtoken');
 exports.Client=Object.create({
     Register:async (req,res) =>{
                 try {
@@ -11,11 +13,17 @@ exports.Client=Object.create({
                 fullname,
                 email,
                 password,
+                active:true,
                 empPic:req.file.filename
             });
+            
             await client.save( async (_error,_client)=>{
                 if(_error) return await res.status(400).json({_error});
-                if(_client) return await res.status(201).json({_client:_client});
+                if(_client){
+                    const token=jwt.sign({userID:_client._id},process.env.secret_key_jwt,{expiresIn:'5d'})
+                    return await res.status(201).json({_client:_client,token:token});
+                }
+                
             })
         } catch (error) {
             return await res.status(500).json({error});
@@ -32,7 +40,8 @@ exports.Client=Object.create({
                 {
                     if(_client.password===password)
                     {
-                        return res.status(200).json({_client:_client});
+                        const token=jwt.sign({userID:_client._id},process.env.secret_key_jwt,{expiresIn:'5d'})
+                        return res.status(200).json({_client,token});
                     }
                     else{
                         return res.status(200).json({_client:'password not matching'});
@@ -58,7 +67,7 @@ exports.Client=Object.create({
     GetClients: async (req,res) => {
         try {
             await Clients.find()
-            .exec( async (_client,_error) => {
+            .exec( async (_error,_client) => {
                 if(_error) return await res.status(400).json({_error});
                 if(_client) return await res.status(200).json({_client});
             })
@@ -75,10 +84,29 @@ exports.Client=Object.create({
                 {new:true})
             .exec( async (_client,_error) => {
                 if(_error) return await res.status(400).json({_error});
-                if(_client) return await res.status(201).json({_updatedClient:_})
+                if(_client) return await res.status(201).json({_updatedClient:_client})
             })
         } catch (error) {
             return await res.status(500).json({error});
         }
+    },
+    ActiveStatusUpdate: async (req,res) => {
+        const {id}=req.params;
+        await Clients.findByIdAndUpdate({_id:id},{...req.body},{new:true})
+        .exec( async (_error,_client) => {
+            if(_error) return await res.status(400).json({_error});
+            if(_client) return await res.status(201).json({_updatedClient:_client})
+        })
     }
+    ,
+    ClientProfileUpdate: async (req,res) => {
+        const {id}=req.params;
+        console.log(req.file)
+        await Clients.findByIdAndUpdate({_id:id},{...req.body,empPic:req?.file?.filename},{new:true})
+        .exec( async (_error,_client) => {
+            if(_error) return await res.status(400).json({_error});
+            if(_client) return await res.status(201).json({_updatedClient:_client})
+        })
+    }
+
 })

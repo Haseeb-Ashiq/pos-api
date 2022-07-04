@@ -1,11 +1,16 @@
 const mongoose=require('mongoose');
 const cartSchema=new mongoose.Schema({
-    customer:{type:String},
-    user:{type:mongoose.Schema.Types.ObjectId,ref:'Users'},
+    customerName:{type:String},
+    client:{type:mongoose.Schema.Types.ObjectId,ref:'Clients'},
     orderNo:{type:String},
+    paymentMethod:{type:String},
+    deliveryAddress:{type:String},
+    status:{type:String,default:'pending'},
     cartItems:[
         {
-            product:{type:mongoose.Schema.Types.ObjectId,ref:'Products'},
+            product_id:{type:String},
+            product_name:{type:String},
+            product_img:{type:String},
             qty:{type:Number,default:1},
             price:{type:Number}
         }

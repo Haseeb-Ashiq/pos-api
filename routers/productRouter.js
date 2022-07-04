@@ -19,5 +19,6 @@ const upload = multer({
 router.post('/product/register',upload,Product.Register);
 router.get('/product/getproducts',Product.GetProducts);
 router.get('/product/getproductbyid/:id',Product.GetProductById);
-router.patch('/product/productupdate/:id',Product.Update);
+router.patch('/product/productupdate/:id',upload,Product.Update);
+router.get('/product/delete/:id',Product.Delete);
 module.exports=router;

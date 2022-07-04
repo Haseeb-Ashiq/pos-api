@@ -25,4 +25,4 @@ app.use('/api',employeRouter);
 app.use('/api',productRouter);
 app.use('/api',catagoryRouter);
 app.use('/api',cartRouter);
-app.listen(port,()=>{console.log(`server is running on port => ${port}`)})
+app.listen(process.env.PORT || port,()=>{console.log(`server is running on port => ${port}`)})
